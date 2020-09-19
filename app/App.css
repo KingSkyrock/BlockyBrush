@@ -50,7 +50,7 @@ body {
   padding-right: 25px;
   padding-left: 25px;
   padding-top: 10px;
-  paddinh-bottom: 15px;
+  padding-bottom: 15px;
   border-radius: 10px;
   background-color: #f7f7f7;
   border-left: 2px solid #e6e6e6;
@@ -116,16 +116,6 @@ li {
   visibility: hidden;
 }
 
-.submit-button {
-  border-radius: 100px;
-  padding: 10px;
-  border: 0px solid white;
-}
-
-.submit-button:hover {
-  background-color: lightblue;
-}
-
 .color-picker {
   padding: 10px;
   border: 1px solid gray;
@@ -182,11 +172,69 @@ li {
   position: relative;
   bottom: 17px;
   left: 58px;
-
 }
 
 .swap-icon:hover {
   filter: brightness(0.5);
+}
+
+.intensity-form {
+  background-color: #f7f7f7;
+  padding: 10px;
+  border-left: 2px solid #e6e6e6;
+  border-bottom: 2px solid #e6e6e6;
+  border-radius: 10px;
+  position: absolute;
+  left: 54px;
+}
+
+.intensity-form2 {
+  background-color: #f7f7f7;
+  padding: 10px;
+  border-left: 2px solid #e6e6e6;
+  border-bottom: 2px solid #e6e6e6;
+  border-radius: 10px;
+  position: absolute;
+  left: 54px;
+  top: -19px;
+}
+
+input[type=submit] {
+  border-radius: 10px;
+  padding: 7px;
+  margin-top: 5px;
+  border: 0px solid white;
+  outline:none;
+}
+
+input[type=submit]:hover {
+  background-color: lightblue;
+}
+
+.submit-button {
+  border-radius: 10px;
+  padding: 7px;
+  margin-top: 5px;
+  border: 0px solid white;
+  outline:none;
+}
+
+.submit-button:hover {
+  background-color: lightblue;
+}
+
+input[type=number] {
+  outline-color: darkgray;
+}
+
+.popover-container {
+  position: relative;
+  display: inline;
+}
+
+.default-label {
+  font-size: 9px;
+  color: silver;
 }
 
 body {

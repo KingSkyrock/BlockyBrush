@@ -12,7 +12,6 @@ import logo from "./logo.svg";
 import logoDark from "./logoDark.svg";
 import swapIcon from "./swapIcon.png";
 import ReactTooltip from 'react-tooltip';
-import { Popover } from 'react-tiny-popover';
 import { faCog, faPaintBrush, faEyeDropper, faEraser, faFill, faFillDrip, faSlash, faChessBoard, faAdjust, faArrowsAlt, faTh, faSync} from "@fortawesome/free-solid-svg-icons";
 import { faSquare, faCircle} from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -90,9 +89,6 @@ export default class App extends React.Component {
       settingsModal: false,
       style: styles,
       darkMode: false,
-      lightPopover: false,
-      saturationPopover: false,
-      transformPopover: false,
     }
   }
 
@@ -229,57 +225,58 @@ export default class App extends React.Component {
                 <br />
               </div>
               <div>
-                <Popover
-                  isOpen={this.state.lightPopover}
-                  position={'right'}
-                  content={<div>content</div>}
-                >
-                  <button aria-label="Light/Darken" data-tip data-effect='solid' data-place="right" data-for='light' className={this.state.style["tool-button"]} onClick={()=>this.setState({usingTool:"LIGHT", intensity1: true, intensity2: false, lightPopover: !this.state.lightPopover})}><FontAwesomeIcon size="2x" color="#404040" icon={faAdjust} /></button>
-                </Popover>
-                {this.state.intensity1 &&
-                  <form onSubmit={(evt) => this.changeLightingInt(evt)}>
-                    Intensity: (default: 10)
-                    <br />
-                    <input defaultValue={this.lightingInt} min="0" max="100" type="number"></input>
-                    <br />
-                    <input type="submit"></input>
-                    <br />
-                    <br />
-                  </form>
-                }
+                <div className={this.state.style["popover-container"]}>
+                  {this.state.intensity1 &&
+                    <form className={this.state.style["intensity-form"]} onSubmit={(evt) => this.changeLightingInt(evt)}>
+                      Intensity: <span className={this.state.style["default-label"]}>(DEFAULT: 10)</span>
+                      <br />
+                      <input defaultValue={this.lightingInt} min="0" max="100" type="number"></input>
+                      <br />
+                      <input value="Done" type="submit"></input>
+                      <br />
+                    </form>
+                  }
+                  <button aria-label="Light/Darken" data-tip data-effect='solid' data-place="right" data-for='light' className={this.state.style["tool-button"]} onClick={()=>this.setState({usingTool:"LIGHT", changingDimensions: false, intensity1: !this.state.intensity1, intensity2: false, transforming: false})}><FontAwesomeIcon size="2x" color="#404040" icon={faAdjust} /></button>
+                </div>
                 <br />
-                <button aria-label="Saturate/Desaturate" data-tip data-effect='solid' data-place="right" data-for='saturate' className={this.state.style["tool-button"]} onClick={()=>this.setState({usingTool:"SATURATE", intensity1: false, intensity2: true})}><FontAwesomeIcon size="2x" flip="both" rotation={120} color="#404040" icon={faAdjust} /></button>
-                {this.state.intensity2 &&
-                  <form onSubmit={(evt) => this.changeSaturationInt(evt)}>
-                    Intensity: (default: 10)
-                    <br />
-                    <input defaultValue={this.saturatingInt} min="0" max="100" type="number"></input>
-                    <br />
-                    <input type="submit"></input>
-                    <br />
-                    <br />
-                  </form>
-                }
+                <div className={this.state.style["popover-container"]}>
+                  {this.state.intensity2 &&
+                    <form className={this.state.style["intensity-form"]} onSubmit={(evt) => this.changeSaturationInt(evt)}>
+                      Intensity: <span className={this.state.style["default-label"]}>(DEFAULT: 10)</span>
+                      <br />
+                      <input defaultValue={this.saturatingInt} min="0" max="100" type="number"></input>
+                      <br />
+                      <input value="Done" type="submit"></input>
+                      <br />
+                    </form>
+                  }
+                  <button aria-label="Saturate/Desaturate" data-tip data-effect='solid' data-place="right" data-for='saturate' className={this.state.style["tool-button"]} onClick={()=>this.setState({usingTool:"SATURATE", changingDimensions: false, intensity1: false, intensity2: !this.state.intensity2, transforming: false})}><FontAwesomeIcon size="2x" flip="both" rotation={120} color="#404040" icon={faAdjust} /></button>
+                </div>
                 <br />
 
                 <button aria-label="Move" data-tip data-effect='solid' data-place="right" data-for='move' className={this.state.style["tool-button"]} onClick={()=>this.setState({usingTool:"MOVE", intensity1: false, intensity2: false})}><FontAwesomeIcon size="2x" color="#404040" icon={faArrowsAlt} /></button>
                 <br />
-                <button aria-label="Change canvas size" data-tip data-effect='solid' data-place="right" data-for='dimensions' className={this.state.style["tool-button"]} onClick={()=>this.setState({changingDimensions: true})}><FontAwesomeIcon size="2x" color="#404040" icon={faTh} /></button>
-                {this.state.changingDimensions &&
-                  <form onSubmit={(evt) => this.changeGridDimensions(evt)}>
-                    <input defaultValue={this.state.gridDimensions[0]} onChange={(evt) => this.inputChange(evt.target.value)} min="1" max="10000" type="number"></input> x <span>{this.state.changeGridInput}</span>
-                    <br />
-                    <input type="submit"></input>
-                  </form>
-                }
+                <div className={this.state.style["popover-container"]}>
+                  {this.state.changingDimensions &&
+                    <form className={this.state.style["intensity-form"]} onSubmit={(evt) => this.changeGridDimensions(evt)}>
+                      Dimensions:
+                      <input defaultValue={this.state.gridDimensions[0]} onChange={(evt) => this.inputChange(evt.target.value)} min="1" max="10000" type="number"></input> x <span>{this.state.changeGridInput}</span>
+                      <br />
+                      <input value="Done" type="submit"></input>
+                    </form>
+                  }
+                  <button aria-label="Change canvas size" data-tip data-effect='solid' data-place="right" data-for='dimensions' className={this.state.style["tool-button"]} onClick={()=>this.setState({changingDimensions: true, intensity1: false, intensity2: false, transforming: false})}><FontAwesomeIcon size="2x" color="#404040" icon={faTh} /></button>
+                </div>
                 <br />
-                <button aria-label="Transform" data-tip data-effect='solid' data-place="right" data-for='transform' className={this.state.style["tool-button"]} onClick={()=>this.setState({transforming: true})}><FontAwesomeIcon size="2x" color="#404040" icon={faSync} /></button>
-                {this.state.transforming &&
-                  <div>
-                    <button aria-label="Verticle flip" onClick={() => this.vertFlip()}>Flip Vertically</button>
-                    <button aria-label="Horozontal flip" onClick={() => this.horoFlip()}>Flip Horozontally</button>
-                  </div>
-                }
+                <div className={this.state.style["popover-container"]}>
+                  <button aria-label="Transform" data-tip data-effect='solid' data-place="right" data-for='transform' className={this.state.style["tool-button"]} onClick={()=>this.setState({transforming: !this.state.transforming, intensity1: false, intensity2: false, changingDimensions: false})}><FontAwesomeIcon size="2x" color="#404040" icon={faSync} /></button>
+                  {this.state.transforming &&
+                    <div className={this.state.style["intensity-form2"]}>
+                      <button className={this.state.style["submit-button"]} aria-label="Verticle flip" onClick={() => this.vertFlip()}>Flip Vertically</button>
+                      <button className={this.state.style["submit-button"]} aria-label="Horozontal flip" onClick={() => this.horoFlip()}>Flip Horozontally</button>
+                    </div>
+                  }
+                </div>
               </div>
             </div>
           </div>
@@ -988,7 +985,9 @@ export default class App extends React.Component {
     var row =  Math.floor(y / this.pd) * this.pd;
 
     var tempSave = this.state.saveState;
-    tempSave[Math.round(row/this.pd)][Math.round(column/this.pd)] = context.fillStyle;
+    if (tempSave[Math.round(row/this.pd)] != undefined) {
+      tempSave[Math.round(row/this.pd)][Math.round(column/this.pd)] = context.fillStyle;
+    }
     context.fillRect(column, row, this.pd, this.pd);
     if (this.brushAnchorPoint != null) {
       var deltax = Math.abs(Math.round(column/this.pd) - this.brushAnchorPoint[0]);
@@ -999,7 +998,9 @@ export default class App extends React.Component {
 
       while(true) {
         context.fillRect(this.brushAnchorPoint[0]*this.pd, this.brushAnchorPoint[1]*this.pd, this.pd, this.pd)
-        tempSave[Math.round(this.brushAnchorPoint[1])][Math.round(this.brushAnchorPoint[0])] = JSON.parse(JSON.stringify(context.fillStyle));
+        if (tempSave[Math.round(this.brushAnchorPoint[1])] != undefined) {
+          tempSave[Math.round(this.brushAnchorPoint[1])][Math.round(this.brushAnchorPoint[0])] = JSON.parse(JSON.stringify(context.fillStyle));
+        }
         if ((this.brushAnchorPoint[0] === Math.round(column/this.pd)) && (this.brushAnchorPoint[1] === Math.round(row/this.pd))) {
           break;
         }
