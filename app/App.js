@@ -2,7 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Modal from 'react-modal';
 import styles from './App.css';
-import darkStyles from './DarkApp.css';
 import { ChromePicker } from 'react-color';
 import tinycolor from 'tinycolor2';
 import Layers from './Layers.js';
@@ -18,7 +17,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 Modal.setAppElement('#root')
 
-//MAKE SURE TO FIX WHITE VS NULL FILL
+//currently theres a bug with white vs null filling
 export default class App extends React.Component {
   constructor(props) {
     super(props);
@@ -82,45 +81,47 @@ export default class App extends React.Component {
       palettes: [],
       currentLayerId: 1,
       layers: [{name: "Layer 1", id: 1, data: []}],
+      frames: [{}],
       palettes: [{name: "Current Colors", id: 0, data: []}],
+      currentPaletteId: 0,
       previewOutput: false,
       previewButtonText: "Preview Output",
       addingColor: false,
       settingsModal: false,
-      style: styles,
       darkMode: false,
+
     }
   }
 
   render() {
     return (
       <div>
-        <menu className={this.state.style["nav-menu"]}>
+        <menu className={styles["nav-menu"]}>
           {this.state.darkMode &&
-            <SVG className={this.state.style["logo"]} src={logoDark} />
+            <SVG className={styles["logo"]} src={logoDark} />
           }
           {!this.state.darkMode &&
-            <SVG className={this.state.style["logo"]} src={logo} />
+            <SVG className={styles["logo"]} src={logo} />
           }
-          <li><button className={this.state.style["menu-button"]} onClick={()=>this.save()}>Save As Image</button></li>
+          <li><button className={styles["menu-button"]} onClick={()=>this.save()}>Save As Image</button></li>
           |
-          <li><button className={this.state.style["menu-button"]} onClick={()=>this.saveFile()}>Save Locally As .blockArt File</button></li>
+          <li><button className={styles["menu-button"]} onClick={()=>this.saveFile()}>Save Locally As .blockArt File</button></li>
           |
-          <li><button className={this.state.style["menu-button"]} onClick={()=>this.uploadLink.current.click()}>Load .blockArt File</button></li>
+          <li><button className={styles["menu-button"]} onClick={()=>this.uploadLink.current.click()}>Load .blockArt File</button></li>
           |
-          <li><button className={this.state.style["menu-button"]} onClick={()=>this.previewOutput(this.state.previewOutput)}>{this.state.previewButtonText}</button></li>
-          <div onMouseDown={(evt) => {this.settings()}} className={this.state.style["settings"]}><FontAwesomeIcon size="2x" color="#404040" icon={faCog} /></div>
+          <li><button className={styles["menu-button"]} onClick={()=>this.previewOutput(this.state.previewOutput)}>{this.state.previewButtonText}</button></li>
+          <div onMouseDown={(evt) => {this.settings()}} className={styles["settings"]}><FontAwesomeIcon size="2x" color="#404040" icon={faCog} /></div>
           <Modal
             isOpen={this.state.settingsModal}
             onRequestClose={()=>{this.setState({settingsModal: false})}}
             contentLabel="Settings"
           >
-            <div className={this.state.style["settings-header"]}>
+            <div className={styles["settings-header"]}>
               Settings
             </div>
             <br />
-            <span className={this.state.style["settings-subheader"]}>THEME</span>
-            <div className={this.state.style["settings-content"]}>
+            <span className={styles["settings-subheader"]}>THEME</span>
+            <div className={styles["settings-content"]}>
               <input type="radio" id="lightMode" name="lightMode" value="Light" /> Light
               <input type="radio" id="lightMode" name="lightMode" value="Light" /> Dark
             </div>
@@ -130,8 +131,8 @@ export default class App extends React.Component {
 
           <input onChange={() => this.loadFile(this.uploadLink.current.files[0])} accept=".blockArt" ref={this.uploadLink} style={{display: 'none'}} type='file'></input>
         </menu>
-        <div className={this.state.style["container"]}>
-          <div className={this.state.style["tools-container"]}>
+        <div className={styles["container"]}>
+          <div className={styles["tools-container"]}>
             <ReactTooltip id='primaryColor' type='dark'>
               <span>Primary Color (left mouse button)</span>
             </ReactTooltip>
@@ -182,9 +183,9 @@ export default class App extends React.Component {
             </ReactTooltip>
             <span>Colors: </span>
 
-            <div data-effect='solid' data-tip data-for='secondaryColor' className={this.state.style["color-picker"]} style={{backgroundColor: this.state.secondColor}} onMouseDown={(evt) => {this.setState({showingSecondColorPicker: true, showingColorPicker: false})} }> </div>
-            <img onMouseDown={(evt) => {this.swapColors();}} src={swapIcon} className={this.state.style["swap-icon"]} alt="swap"/>
-            <div data-effect='solid' data-tip data-for='primaryColor' className={this.state.style["bottom-picker"]} style={{backgroundColor: this.state.currentColor}} onMouseDown={(evt) => {this.setState({showingColorPicker: true, showingSecondColorPicker: false})} }> </div>
+            <div data-effect='solid' data-tip data-for='secondaryColor' className={styles["color-picker"]} style={{backgroundColor: this.state.secondColor}} onMouseDown={(evt) => {this.setState({showingSecondColorPicker: true, showingColorPicker: false})} }> </div>
+            <img onMouseDown={(evt) => {this.swapColors();}} src={swapIcon} className={styles["swap-icon"]} alt="swap"/>
+            <div data-effect='solid' data-tip data-for='primaryColor' className={styles["bottom-picker"]} style={{backgroundColor: this.state.currentColor}} onMouseDown={(evt) => {this.setState({showingColorPicker: true, showingSecondColorPicker: false})} }> </div>
 
             {this.state.showingColorPicker &&
               <span>
@@ -203,32 +204,32 @@ export default class App extends React.Component {
               </span>
             }
             <br />
-            <div className={this.state.style["tools-sub-container"]}>
+            <div className={styles["tools-sub-container"]}>
               <div>
-                <button aria-label="Eyedropper" data-tip data-effect='solid' data-place="right" data-for='eyedropper' className={this.state.style["tool-button"]} onClick={()=>this.setState({usingTool:"EYEDROPPER", intensity1: false, intensity2: false})}><FontAwesomeIcon size="2x" color="#404040" icon={faEyeDropper} /></button>
+                <button aria-label="Eyedropper" data-tip data-effect='solid' data-place="right" data-for='eyedropper' className={styles["tool-button"]} onClick={()=>this.setState({usingTool:"EYEDROPPER", intensity1: false, intensity2: false})}><FontAwesomeIcon size="2x" color="#404040" icon={faEyeDropper} /></button>
                 <br />
-                <button aria-label="Eraser" data-tip data-effect='solid' data-place="right" data-for='eraser' className={this.state.style["tool-button"]} onClick={()=>this.setState({usingTool:"ERASER", intensity1: false, intensity2: false})}><FontAwesomeIcon size="2x" color="#404040" icon={faEraser} /></button>
+                <button aria-label="Eraser" data-tip data-effect='solid' data-place="right" data-for='eraser' className={styles["tool-button"]} onClick={()=>this.setState({usingTool:"ERASER", intensity1: false, intensity2: false})}><FontAwesomeIcon size="2x" color="#404040" icon={faEraser} /></button>
                 <br />
-                <button aria-label="Brush" data-tip data-effect='solid' data-place="right" data-for='brush' className={this.state.style["tool-button"]} onClick={()=>this.setState({usingTool:"BRUSH", intensity1: false, intensity2: false})}><FontAwesomeIcon size="2x" color="#404040" icon={faPaintBrush} /></button>
+                <button aria-label="Brush" data-tip data-effect='solid' data-place="right" data-for='brush' className={styles["tool-button"]} onClick={()=>this.setState({usingTool:"BRUSH", intensity1: false, intensity2: false})}><FontAwesomeIcon size="2x" color="#404040" icon={faPaintBrush} /></button>
                 <br />
-                <button aria-label="Bucket" data-tip data-effect='solid' data-place="right" data-for='bucket' className={this.state.style["tool-button"]} onClick={()=>this.setState({usingTool:"BUCKET", intensity1: false, intensity2: false})}><FontAwesomeIcon size="2x" color="#404040" icon={faFillDrip} /></button>
+                <button aria-label="Bucket" data-tip data-effect='solid' data-place="right" data-for='bucket' className={styles["tool-button"]} onClick={()=>this.setState({usingTool:"BUCKET", intensity1: false, intensity2: false})}><FontAwesomeIcon size="2x" color="#404040" icon={faFillDrip} /></button>
                 <br />
-                <button aria-label="Replace Color" data-tip data-effect='solid' data-place="right" data-for='replace' className={this.state.style["tool-button"]} onClick={()=>this.setState({usingTool:"BUCKETALL", intensity1: false, intensity2: false})}><FontAwesomeIcon size="2x" color="#404040" icon={faFill} /></button>
+                <button aria-label="Replace Color" data-tip data-effect='solid' data-place="right" data-for='replace' className={styles["tool-button"]} onClick={()=>this.setState({usingTool:"BUCKETALL", intensity1: false, intensity2: false})}><FontAwesomeIcon size="2x" color="#404040" icon={faFill} /></button>
                 <br />
-                <button aria-label="Rectangle" data-tip data-effect='solid' data-place="right" data-for='rect' className={this.state.style["tool-button"]} onClick={()=>this.setState({usingTool:"RECT", intensity1: false, intensity2: false})}><FontAwesomeIcon size="2x" color="#404040" icon={faSquare} /></button>
+                <button aria-label="Rectangle" data-tip data-effect='solid' data-place="right" data-for='rect' className={styles["tool-button"]} onClick={()=>this.setState({usingTool:"RECT", intensity1: false, intensity2: false})}><FontAwesomeIcon size="2x" color="#404040" icon={faSquare} /></button>
                 <br />
-                <button aria-label="Line" data-tip data-effect='solid' data-place="right" data-for='line' className={this.state.style["tool-button"]} onClick={()=>this.setState({usingTool:"LINE", intensity1: false, intensity2: false})}><FontAwesomeIcon size="2x" color="#404040" icon={faSlash} /></button>
+                <button aria-label="Line" data-tip data-effect='solid' data-place="right" data-for='line' className={styles["tool-button"]} onClick={()=>this.setState({usingTool:"LINE", intensity1: false, intensity2: false})}><FontAwesomeIcon size="2x" color="#404040" icon={faSlash} /></button>
                 <br />
-                <button aria-label="Circle" data-tip data-effect='solid' data-place="right" data-for='circle' className={this.state.style["tool-button"]} onClick={()=>this.setState({usingTool:"CIRCLE", intensity1: false, intensity2: false})}><FontAwesomeIcon size="2x" color="#404040" icon={faCircle} /></button>
+                <button aria-label="Circle" data-tip data-effect='solid' data-place="right" data-for='circle' className={styles["tool-button"]} onClick={()=>this.setState({usingTool:"CIRCLE", intensity1: false, intensity2: false})}><FontAwesomeIcon size="2x" color="#404040" icon={faCircle} /></button>
                 <br />
-                <button aria-label="Dither" data-tip data-effect='solid' data-place="right" data-for='dither' className={this.state.style["tool-button"]} onClick={()=>this.setState({usingTool:"DITHER", intensity1: false, intensity2: false})}><FontAwesomeIcon size="2x" color="#404040" icon={faChessBoard} /></button>
+                <button aria-label="Dither" data-tip data-effect='solid' data-place="right" data-for='dither' className={styles["tool-button"]} onClick={()=>this.setState({usingTool:"DITHER", intensity1: false, intensity2: false})}><FontAwesomeIcon size="2x" color="#404040" icon={faChessBoard} /></button>
                 <br />
               </div>
               <div>
-                <div className={this.state.style["popover-container"]}>
+                <div className={styles["popover-container"]}>
                   {this.state.intensity1 &&
-                    <form className={this.state.style["intensity-form"]} onSubmit={(evt) => this.changeLightingInt(evt)}>
-                      Intensity: <span className={this.state.style["default-label"]}>(DEFAULT: 10)</span>
+                    <form className={styles["intensity-form"]} onSubmit={(evt) => this.changeLightingInt(evt)}>
+                      Intensity: <span className={styles["default-label"]}>(DEFAULT: 10)</span>
                       <br />
                       <input defaultValue={this.lightingInt} min="0" max="100" type="number"></input>
                       <br />
@@ -236,13 +237,13 @@ export default class App extends React.Component {
                       <br />
                     </form>
                   }
-                  <button aria-label="Light/Darken" data-tip data-effect='solid' data-place="right" data-for='light' className={this.state.style["tool-button"]} onClick={()=>this.setState({usingTool:"LIGHT", changingDimensions: false, intensity1: !this.state.intensity1, intensity2: false, transforming: false})}><FontAwesomeIcon size="2x" color="#404040" icon={faAdjust} /></button>
+                  <button aria-label="Light/Darken" data-tip data-effect='solid' data-place="right" data-for='light' className={styles["tool-button"]} onClick={()=>this.setState({usingTool:"LIGHT", changingDimensions: false, intensity1: !this.state.intensity1, intensity2: false, transforming: false})}><FontAwesomeIcon size="2x" color="#404040" icon={faAdjust} /></button>
                 </div>
                 <br />
-                <div className={this.state.style["popover-container"]}>
+                <div className={styles["popover-container"]}>
                   {this.state.intensity2 &&
-                    <form className={this.state.style["intensity-form"]} onSubmit={(evt) => this.changeSaturationInt(evt)}>
-                      Intensity: <span className={this.state.style["default-label"]}>(DEFAULT: 10)</span>
+                    <form className={styles["intensity-form"]} onSubmit={(evt) => this.changeSaturationInt(evt)}>
+                      Intensity: <span className={styles["default-label"]}>(DEFAULT: 10)</span>
                       <br />
                       <input defaultValue={this.saturatingInt} min="0" max="100" type="number"></input>
                       <br />
@@ -250,37 +251,37 @@ export default class App extends React.Component {
                       <br />
                     </form>
                   }
-                  <button aria-label="Saturate/Desaturate" data-tip data-effect='solid' data-place="right" data-for='saturate' className={this.state.style["tool-button"]} onClick={()=>this.setState({usingTool:"SATURATE", changingDimensions: false, intensity1: false, intensity2: !this.state.intensity2, transforming: false})}><FontAwesomeIcon size="2x" flip="both" rotation={120} color="#404040" icon={faAdjust} /></button>
+                  <button aria-label="Saturate/Desaturate" data-tip data-effect='solid' data-place="right" data-for='saturate' className={styles["tool-button"]} onClick={()=>this.setState({usingTool:"SATURATE", changingDimensions: false, intensity1: false, intensity2: !this.state.intensity2, transforming: false})}><FontAwesomeIcon size="2x" flip="both" rotation={120} color="#404040" icon={faAdjust} /></button>
                 </div>
                 <br />
 
-                <button aria-label="Move" data-tip data-effect='solid' data-place="right" data-for='move' className={this.state.style["tool-button"]} onClick={()=>this.setState({usingTool:"MOVE", intensity1: false, intensity2: false})}><FontAwesomeIcon size="2x" color="#404040" icon={faArrowsAlt} /></button>
+                <button aria-label="Move" data-tip data-effect='solid' data-place="right" data-for='move' className={styles["tool-button"]} onClick={()=>this.setState({usingTool:"MOVE", intensity1: false, intensity2: false})}><FontAwesomeIcon size="2x" color="#404040" icon={faArrowsAlt} /></button>
                 <br />
-                <div className={this.state.style["popover-container"]}>
+                <div className={styles["popover-container"]}>
                   {this.state.changingDimensions &&
-                    <form className={this.state.style["intensity-form"]} onSubmit={(evt) => this.changeGridDimensions(evt)}>
+                    <form className={styles["intensity-form"]} onSubmit={(evt) => this.changeGridDimensions(evt)}>
                       Dimensions:
                       <input defaultValue={this.state.gridDimensions[0]} onChange={(evt) => this.inputChange(evt.target.value)} min="1" max="10000" type="number"></input> x <span>{this.state.changeGridInput}</span>
                       <br />
                       <input value="Done" type="submit"></input>
                     </form>
                   }
-                  <button aria-label="Change canvas size" data-tip data-effect='solid' data-place="right" data-for='dimensions' className={this.state.style["tool-button"]} onClick={()=>this.setState({changingDimensions: true, intensity1: false, intensity2: false, transforming: false})}><FontAwesomeIcon size="2x" color="#404040" icon={faTh} /></button>
+                  <button aria-label="Change canvas size" data-tip data-effect='solid' data-place="right" data-for='dimensions' className={styles["tool-button"]} onClick={()=>this.setState({changingDimensions: true, intensity1: false, intensity2: false, transforming: false})}><FontAwesomeIcon size="2x" color="#404040" icon={faTh} /></button>
                 </div>
                 <br />
-                <div className={this.state.style["popover-container"]}>
-                  <button aria-label="Transform" data-tip data-effect='solid' data-place="right" data-for='transform' className={this.state.style["tool-button"]} onClick={()=>this.setState({transforming: !this.state.transforming, intensity1: false, intensity2: false, changingDimensions: false})}><FontAwesomeIcon size="2x" color="#404040" icon={faSync} /></button>
+                <div className={styles["popover-container"]}>
+                  <button aria-label="Transform" data-tip data-effect='solid' data-place="right" data-for='transform' className={styles["tool-button"]} onClick={()=>this.setState({transforming: !this.state.transforming, intensity1: false, intensity2: false, changingDimensions: false})}><FontAwesomeIcon size="2x" color="#404040" icon={faSync} /></button>
                   {this.state.transforming &&
-                    <div className={this.state.style["intensity-form2"]}>
-                      <button className={this.state.style["submit-button"]} aria-label="Verticle flip" onClick={() => this.vertFlip()}>Flip Vertically</button>
-                      <button className={this.state.style["submit-button"]} aria-label="Horozontal flip" onClick={() => this.horoFlip()}>Flip Horozontally</button>
+                    <div className={styles["intensity-form2"]}>
+                      <button className={styles["submit-button"]} aria-label="Verticle flip" onClick={() => this.vertFlip()}>Flip Vertically</button>
+                      <button className={styles["submit-button"]} aria-label="Horozontal flip" onClick={() => this.horoFlip()}>Flip Horozontally</button>
                     </div>
                   }
                 </div>
               </div>
             </div>
           </div>
-          <div className={this.state.style["canvas-container"]}>
+          <div className={styles["canvas-container"]}>
             {!this.state.previewOutput &&
               <canvas
                 width='640'
@@ -290,7 +291,7 @@ export default class App extends React.Component {
                 onMouseMove={(evt)=>this.canvasMouseMove(evt)}
                 onMouseDown={(evt)=>this.canvasMouseDown(evt)}
                 ref={this.mainCanvas}
-                className={this.state.style["main-canvas"]}
+                className={styles["main-canvas"]}
                 onContextMenu={(evt)=>{evt.preventDefault(); return false}}
               ></canvas>
             }
@@ -299,13 +300,13 @@ export default class App extends React.Component {
                 width='640'
                 height='640'
                 ref={this.previewCanvas}
-                className={this.state.style["main-canvas"]}
+                className={styles["main-canvas"]}
                 onContextMenu={(evt)=>{evt.preventDefault(); return false}}
               ></canvas>
             }
 
           </div>
-          <menu className={this.state.style["right-menu"]}>
+          <menu className={styles["right-menu"]}>
             <Layers
               layers={this.state.layers}
               changedLayer={this.state.currentLayerId}
@@ -314,10 +315,10 @@ export default class App extends React.Component {
                 this.layerCount += 1;
 
                 var arr = this.state.layers
-                var arr2 = new Array(32);
+                var arr2 = new Array(parseInt(this.state.gridDimensions[0]));
 
                 for (var i = 0; i < arr2.length; i++) {
-                  arr2[i] = new Array(32);
+                  arr2[i] = new Array(parseInt(this.state.gridDimensions[1]));
                 }
                 arr.push({name: "Layer " + this.layerIdCount, id: this.layerIdCount, data: arr2});
 
@@ -400,6 +401,9 @@ export default class App extends React.Component {
               addColor={() => {
                 this.setState({addingColor: "#000000"});
               }}
+              getCurrent={(currentPaletteId) => {
+                this.setState({currentPaletteId: currentPaletteId});
+              }}
             />
             {this.state.addingColor &&
               <div>
@@ -413,13 +417,19 @@ export default class App extends React.Component {
               </div>
             }
           </menu>
+          <div className={styles["frames-container"]}>
+            Frames:
+            <br />
+            <b>Animations are currently unimplemented!</b>
+          </div>
         </div>
+
         <br/><br/>
 
         <canvas
           width={this.state.res}
           height={this.state.res}
-          className={this.state.style["hidden-canvas"]}
+          className={styles["hidden-canvas"]}
           ref={this.hiddenCanvas}
         ></canvas>
         <a ref={this.downloadLink} href="" style={{display: 'none'}}></a>
@@ -479,6 +489,7 @@ export default class App extends React.Component {
 
   addPaletteColor(color) {
     var temp = JSON.parse(JSON.stringify(this.state.palettes));
+    console.log(this.state.pallettes[this.state.currentLayerId])
   }
 
   createPalette(evt) {
@@ -698,9 +709,8 @@ export default class App extends React.Component {
     this.setState({palettes: palettes});
   }
 
-  changeGridDimensions(evt) { /////////////////////////////////////////////////////////////////////////////////////////SAVE FOR TOMORROW! FIX CANVAS CHANGING SIZE WITH LAYERS
+  changeGridDimensions(evt) {
     var context = this.mainCanvas.current.getContext("2d");
-
     evt.preventDefault();
 
     this.setState({gridDimensions: [this.state.changeGridInput, this.state.changeGridInput]}, () => {
@@ -711,7 +721,14 @@ export default class App extends React.Component {
       for (var i = 0; i < arr.length; i++) {
         arr[i] = new Array(parseInt(this.state.changeGridInput));
       }
-      this.setState({saveState: arr, layerOpacitySave: arr, changingDimensions: false});
+
+      var temp = JSON.parse(JSON.stringify(this.state.layers))
+      for (var i = 0; i < this.state.layers.length; i++) {
+        temp[i].data = JSON.parse(JSON.stringify(arr));
+
+      }
+
+      this.setState({layers: temp, saveState: arr, layerOpacitySave: arr, changingDimensions: false});
 
       this.history.push(JSON.parse(JSON.stringify(arr)));
       context.clearRect(0, 0, 640, 640);
@@ -763,7 +780,7 @@ export default class App extends React.Component {
   }
 
   keyShortcuts(evt) {
-    if(evt.keyCode === 90 && evt.ctrlKey && !evt.shiftKey) {
+    if (evt.keyCode === 90 && evt.ctrlKey && !evt.shiftKey) {
       var context = this.mainCanvas.current.getContext("2d");
       context.beginPath();
       this.drawGrid();
@@ -806,11 +823,11 @@ export default class App extends React.Component {
     context.strokeStyle = "rgba(255, 255, 255)";
     context.lineWidth = 0.5;
     context.beginPath();
-    for (var i = 0; i < this.state.gridDimensions[0] * this.state.gridDimensions[1]; i++) {
+    for (var i = 0; i < this.state.gridDimensions[0]; i++) {
       context.moveTo(0, i*this.pd);
       context.lineTo(640, i*this.pd);
     }
-    for (var i = 0; i < this.state.gridDimensions[0] * this.state.gridDimensions[1]; i++) {
+    for (var i = 0; i < this.state.gridDimensions[1]; i++) {
       context.moveTo(i*this.pd, 0);
       context.lineTo(i*this.pd, 640);
     }

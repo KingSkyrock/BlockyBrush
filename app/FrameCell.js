@@ -7,7 +7,6 @@ export default class LayerCell extends React.Component {
     super(props);
 
     this.state = {
-      bgColor: '#EFEFEF',
       selected: false,
     }
   };

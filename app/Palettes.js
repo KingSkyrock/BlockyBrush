@@ -1,7 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
+import styles from './App.css';
 import ColorCell from './ColorCell.js';
+
 
 export default class Palettes extends React.Component {
   constructor(props) {
@@ -16,20 +18,21 @@ export default class Palettes extends React.Component {
 
   render() {
     return (
-      <div style={{float: 'right', display: 'inline', border: '2px solid #adbed9', borderRadius: '3px', minHeight: '40px', width: '250px'}}>
-        <b>Palettes:</b>
+      <div style={{overflow: "auto", maxHeight: "250px", display: 'inline', borderRadius: '3px', minHeight: '40px', width: '250px'}}>
+        <span>Palettes:</span>
         {" "}
         <br />
-        <select ref={this.paletteDropdown} onChange={() => this.handlePaletteChange()}>
-          {this.props.palettes.map((palettes) => {
-            return (
-              <option value={palettes.id.toString()}>{palettes.name}</option>
-            );
-          })}
-        </select>
-        <button onClick={() => this.props.addPalette()}>+</button>
-        <button onClick={() => this.props.addColor()}>Add Color</button>
-        <br />
+        <div className={styles["sticky-menu"]}>
+          <select ref={this.paletteDropdown} onChange={() => this.handlePaletteChange()}>
+            {this.props.palettes.map((palettes) => {
+              return (
+                <option value={palettes.id.toString()}>{palettes.name}</option>
+              );
+            })}
+          </select>
+          <button className={styles["layer-button"]} onClick={() => this.props.addPalette()}>+</button>
+          <button className={styles["layer-button2"]} onClick={() => this.props.addColor()}>Add Color</button>
+        </div>
         {this.state.currentPaletteName}:
         {this.props.palettes[this.state.currentPaletteId].data.map((colors) => {
           return (
@@ -56,6 +59,7 @@ export default class Palettes extends React.Component {
       }
     }
     this.setState({currentPaletteName: name, currentPaletteId: value})
+    this.props.getCurrent(value)
   }
 }
 
@@ -63,5 +67,6 @@ Palettes.propTypes = {
   palettes: PropTypes.array.isRequired,
   addPalette: PropTypes.func.isRequired,
   addColor: PropTypes.func.isRequired,
-  setColor: PropTypes.func.isRequired
+  setColor: PropTypes.func.isRequired,
+  getCurrent: PropTypes.func.isRequired,
 };
