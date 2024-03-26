@@ -716,25 +716,28 @@ export default class App extends React.Component {
     this.setState({gridDimensions: [this.state.changeGridInput, this.state.changeGridInput]}, () => {
       this.pd = 640/this.state.changeGridInput;
 
-      var arr = new Array(parseInt(this.state.changeGridInput));
-
-      for (var i = 0; i < arr.length; i++) {
-        arr[i] = new Array(parseInt(this.state.changeGridInput));
-      }
-
+      var currentIndex;
       var temp = JSON.parse(JSON.stringify(this.state.layers))
       for (var i = 0; i < this.state.layers.length; i++) {
-        temp[i].data = JSON.parse(JSON.stringify(arr));
-
+        if (this.state.layers[i].id == this.state.currentLayerId) {
+          currentIndex = i;
+        }
+        temp[i].data = new Array(parseInt(this.state.changeGridInput));
+        for (var j = 0; j < temp[i].data.length; j++) {
+          temp[i].data[j] = new Array(parseInt(this.state.changeGridInput));
+          for (var k = 0; k < temp[i].data[j].length; k++) {
+            if (this.state.layers[i].data[j] && this.state.layers[i].data[j][k]) {
+              temp[i].data[j][k] = this.state.layers[i].data[j][k];
+            }
+          }
+        }
       }
 
-      this.setState({layers: temp, saveState: arr, layerOpacitySave: arr, changingDimensions: false});
-
-      this.history.push(JSON.parse(JSON.stringify(arr)));
-      context.clearRect(0, 0, 640, 640);
-      this.drawGrid();
-      this.drawSave(context)
-      context.stroke()
+      this.setState({layers: temp, saveState: temp[currentIndex].data, layerOpacitySave: temp[currentIndex].data, changingDimensions: false}, () => {
+        this.history.push(JSON.parse(JSON.stringify(temp[currentIndex].data)));
+        this.drawCanvas(context);
+        context.stroke();
+      });
     });
   }
 
